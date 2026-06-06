@@ -12,86 +12,104 @@
   <link rel="stylesheet" href="/static/css/style.css" />
 </head>
 <body>
-
-  <!-- ── Background texture ─────────────────────────── -->
+ 
   <div class="bg-grid"></div>
   <div class="blob blob-1"></div>
   <div class="blob blob-2"></div>
-
-  <!-- ── Page wrapper ───────────────────────────────── -->
+ 
   <main class="wrapper">
-
-    <!-- Header -->
+ 
     <header class="site-header">
       <div class="logo">
         <span class="logo-icon">◈</span>
         <span class="logo-text">NutriScan</span>
       </div>
-      <p class="tagline">AI-powered food health classification</p>
+      <p class="tagline">AI powered food health classification</p>
     </header>
-
-    <!-- Card -->
+    
+    <section class="how-it-works">
+      <h2>How it works</h2>
+      <div class="steps">
+        <div class="step">
+          <span class="step-num">01</span>
+          <p>Enter the six nutritional values from your food's nutrition label.</p>
+        </div>
+        <div class="step">
+          <span class="step-num">02</span>
+          <p>Your inputs are sent to a trained machine learning model running on the server.</p>
+        </div>
+        <div class="step">
+          <span class="step-num">03</span>
+          <p>The model returns a <strong>Healthy</strong> or <strong>Not Healthy</strong> classification instantly.</p>
+        </div>
+      </div>
+    </section>
+    <br>
     <section class="card">
-
+ 
       <div class="card-header">
         <h1>Analyse Your Food</h1>
-        <p>Enter the macronutrient values per serving and let the model decide.</p>
+        <p>Enter the nutritional values per serving and let the model decide.</p>
       </div>
-
-      <!-- Form -->
+ 
       <div class="form-grid" id="inputForm">
-
+ 
         <div class="input-group">
-          <label for="calories">
-            <span class="label-icon">🔥</span> Calories
-            <span class="unit">kcal</span>
+          <label for="carbohydrate">
+            <span class="label-icon"></span> Carbohydrate
+            <span class="unit">g</span>
           </label>
-          <input
-            type="number" id="calories" name="calories"
-            placeholder="e.g. 250" min="0" step="1"
-          />
-          <span class="input-hint">Total energy per serving</span>
+          <input type="number" id="carbohydrate" placeholder="e.g. 30" min="0" step="0.1" />
+          <span class="input-hint">Total carbohydrates</span>
         </div>
-
+ 
         <div class="input-group">
           <label for="protein">
-            <span class="label-icon">💪</span> Protein
+            <span class="label-icon"></span> Protein
             <span class="unit">g</span>
           </label>
-          <input
-            type="number" id="protein" name="protein"
-            placeholder="e.g. 20" min="0" step="0.1"
-          />
-          <span class="input-hint">Grams of protein</span>
+          <input type="number" id="protein" placeholder="e.g. 20" min="0" step="0.1" />
+          <span class="input-hint">Total protein</span>
         </div>
-
+ 
         <div class="input-group">
-          <label for="fat">
-            <span class="label-icon">🫧</span> Fat
+          <label for="fat_total">
+            <span class="label-icon"></span> Total Fat
             <span class="unit">g</span>
           </label>
-          <input
-            type="number" id="fat" name="fat"
-            placeholder="e.g. 8" min="0" step="0.1"
-          />
-          <span class="input-hint">Total fat content</span>
+          <input type="number" id="fat_total" placeholder="e.g. 8" min="0" step="0.1" />
+          <span class="input-hint">Total lipid / fat</span>
         </div>
-
+ 
         <div class="input-group">
-          <label for="carbs">
-            <span class="label-icon">🌾</span> Carbohydrates
+          <label for="saturated_fat">
+            <span class="label-icon"></span> Saturated Fat
             <span class="unit">g</span>
           </label>
-          <input
-            type="number" id="carbs" name="carbs"
-            placeholder="e.g. 30" min="0" step="0.1"
-          />
-          <span class="input-hint">Total carbs content</span>
+          <input type="number" id="saturated_fat" placeholder="e.g. 3" min="0" step="0.1" />
+          <span class="input-hint">Saturated fat content</span>
         </div>
-
+ 
+        <div class="input-group">
+          <label for="sugar">
+            <span class="label-icon"></span> Sugar
+            <span class="unit">g</span>
+          </label>
+          <input type="number" id="sugar" placeholder="e.g. 10" min="0" step="0.1" />
+          <span class="input-hint">Total sugar</span>
+        </div>
+ 
+        <div class="input-group">
+          <label for="sodium">
+            <span class="label-icon"></span> Sodium
+            <span class="unit">mg</span>
+          </label>
+          <input type="number" id="sodium" placeholder="e.g. 150" min="0" step="0.1" />
+          <span class="input-hint">Major mineral sodium</span>
+        </div>
+ 
       </div>
-
-      <!-- CTA Button -->
+ 
       <button class="btn-classify" id="classifyBtn" onclick="classify()">
         <span class="btn-text">Classify Food</span>
         <span class="btn-spinner" id="spinner" hidden>
@@ -100,8 +118,7 @@
           </svg>
         </span>
       </button>
-
-      <!-- Result box (hidden until prediction) -->
+ 
       <div class="result-box" id="resultBox" hidden>
         <div class="result-inner">
           <div class="result-icon" id="resultIcon"></div>
@@ -112,40 +129,19 @@
         </div>
         <div class="result-breakdown" id="resultBreakdown"></div>
       </div>
-
-      <!-- Error box -->
+ 
       <div class="error-box" id="errorBox" hidden>
         <span class="error-icon">⚠</span>
         <span id="errorMessage"></span>
       </div>
-
+ 
     </section>
-
-    <!-- How it works section -->
-    <section class="how-it-works">
-      <h2>How it works</h2>
-      <div class="steps">
-        <div class="step">
-          <span class="step-num">01</span>
-          <p>Enter the four macronutrient values from your food's nutrition label.</p>
-        </div>
-        <div class="step">
-          <span class="step-num">02</span>
-          <p>Your inputs are sent to a trained machine-learning model running on the server.</p>
-        </div>
-        <div class="step">
-          <span class="step-num">03</span>
-          <p>The model returns a <strong>Healthy</strong> or <strong>Not Healthy</strong> classification instantly.</p>
-        </div>
-      </div>
-    </section>
-
+ 
     <footer class="site-footer">
-      <p>Built with Flask · scikit-learn · vanilla JS &nbsp;|&nbsp; NutriScan ML Project</p>
+      <p>Build By ViViVy</p>
     </footer>
-
+ 
   </main>
-
   <script src="/static/js/main.js"></script>
 </body>
 </html>

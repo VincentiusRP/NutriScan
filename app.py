@@ -1,22 +1,15 @@
 """
 food-classifier/app.py
-======================
-Flask backend — loads the trained ML model and exposes a
-/predict POST endpoint that the frontend calls via fetch().
- 
-Run:  python app.py
-Then open: http://127.0.0.1:5000
 """
  
 import os
 import joblib
 import numpy as np
+import pandas as pd
 from flask import Flask, request, jsonify, render_template
  
-# ── App setup ──────────────────────────────────────────────────────────────
 app = Flask(__name__)
  
-# ── Load model at startup ──────────────────────────────────────────────────
 MODEL_PATH = os.path.join("model", "food_classifier_model.pkl")
  
 try:
@@ -25,20 +18,16 @@ try:
 except FileNotFoundError:
     raise FileNotFoundError(
         f"\n[ERROR] Model file not found at '{MODEL_PATH}'.\n"
-        "   Place your model at  food-classifier/model/food_classifier_model.pkl\n"
     )
  
-# No scaler used
 scaler = None
  
-# ── Label mapping ──────────────────────────────────────────────────────────
 LABEL_MAP = {
     0: "Not Healthy",
     1: "Healthy",
+    2: "Fair",
 }
- 
-# ── Routes ─────────────────────────────────────────────────────────────────
- 
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -49,7 +38,11 @@ def predict():
     try:
         data = request.get_json(force=True)
  
-        required_fields = ["calories", "protein", "fat", "carbs"]
+        required_fields = [
+            "carbohydrate", "protein", "fat_total",
+            "saturated_fat", "sugar", "sodium"
+        ]
+ 
         for field in required_fields:
             if field not in data:
                 return jsonify({"error": f"Missing field: '{field}'"}), 400
@@ -58,15 +51,29 @@ def predict():
             except (ValueError, TypeError):
                 return jsonify({"error": f"Field '{field}' must be a number"}), 400
  
-        calories = float(data["calories"])
-        protein  = float(data["protein"])
-        fat      = float(data["fat"])
-        carbs    = float(data["carbs"])
+        carbohydrate  = float(data["carbohydrate"])
+        protein       = float(data["protein"])
+        fat_total     = float(data["fat_total"])
+        saturated_fat = float(data["saturated_fat"])
+        sugar         = float(data["sugar"])
+        sodium        = float(data["sodium"])
  
-        if any(v < 0 for v in [calories, protein, fat, carbs]):
+        values = [carbohydrate, protein, fat_total, saturated_fat, sugar, sodium]
+        if any(v < 0 for v in values):
             return jsonify({"error": "All values must be non-negative"}), 400
  
-        features = np.array([[calories, protein, fat, carbs]])
+        features = pd.DataFrame([[carbohydrate, protein, fat_total, saturated_fat, sugar, sodium]],
+            columns=[
+                'Data.Carbohydrate',
+                'Data.Protein',
+                'Data.Fat.Total Lipid',
+                'Data.Fat.Saturated Fat',
+                'Data.Sugar Total',
+                'Data.Major Minerals.Sodium'
+            ])
+ 
+        if scaler is not None:
+            features = scaler.transform(features)
  
         raw_label = model.predict(features)[0]
  
